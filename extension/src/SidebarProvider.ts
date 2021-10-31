@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { getNonce } from "./util";
+import { getNonce, LocalStorageService, StorageKey } from "./util";
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
 
@@ -12,11 +12,13 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 	private static readonly viewType = 'jdplang.sidebar';
     private _view?: vscode.WebviewView;
     //private _doc?: vscode.TextDocument;
+    private storageManager: LocalStorageService;
 
 	constructor(
 		private readonly context: vscode.ExtensionContext
-        //private readonly _extensionUri: vscode.Uri
-	) { }
+	) {
+        this.storageManager = new LocalStorageService(context.workspaceState);
+    }
 
     public resolveWebviewView(webviewView: vscode.WebviewView) {
         this._view = webviewView;
@@ -32,18 +34,50 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 
         webviewView.webview.onDidReceiveMessage(async (msg) => {
             switch (msg.type) {
-                case "onInfo": {
-                    if (!msg.value) {
-                      return;
+
+                case "getLanguage": {
+                    const langcode = this.storageManager.getValue<string>(StorageKey.langcode);
+                    if (langcode != undefined) {
+                        this._view?.webview.postMessage({type: 'setLanguage', data: langcode});
                     }
-                    vscode.window.showInformationMessage(msg.value);
                     break;
                 }
-                case "onError": {
-                    if (!msg.value) {
+
+                case "changeLanguage": {
+                    if (!msg.data) {
                       return;
                     }
-                    vscode.window.showErrorMessage(msg.value);
+                    const langcode = await vscode.window.showQuickPick(msg.data);
+                    if (langcode != undefined) {
+                        this.storageManager.setValue<string>(StorageKey.langcode, langcode);
+                        this._view?.webview.postMessage({type: 'setLanguage', data: langcode});
+                    }
+                    break;
+                }
+
+                case "newAnkiPhrase": {
+                    vscode.commands.executeCommand('jdplang.ankiPhrase.new');
+                    break;
+                }
+
+                case "newLangText": {
+                    vscode.commands.executeCommand('jdplang.langText.new');
+                    break;
+                }
+                
+                case "onInfo": {
+                    if (!msg.data) {
+                      return;
+                    }
+                    vscode.window.showInformationMessage(msg.data);
+                    break;
+                }
+
+                case "onError": {
+                    if (!msg.data) {
+                      return;
+                    }
+                    vscode.window.showErrorMessage(msg.data);
                     break;
                 }
             }
@@ -54,6 +88,9 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 
 		const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(
 			this.context.extensionUri, 'out', 'webviews', 'LangSidebar.js'));
+
+        // const scriptApiUri = webview.asWebviewUri(vscode.Uri.joinPath(
+        //     this.context.extensionUri, 'media', 'vsCodeApi.js'));
 
 		const styleUri = webview.asWebviewUri(vscode.Uri.joinPath(
 			this.context.extensionUri, 'out', 'webviews', 'LangSidebar.css'));
@@ -87,8 +124,11 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 				<title>Anki Phrase</title>
 			</head>
 			<body>
+                <script nonce="${nonce}">
+                    const vscode = acquireVsCodeApi();
+                </script>
                 <script nonce="${nonce}" src="${scriptUri}"></script>
-			</body>
+                </body>
 			</html>`;
 	}
 }

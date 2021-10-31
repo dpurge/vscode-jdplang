@@ -11,8 +11,9 @@
   ],
   "activationEvents": [
     "onCustomEditor:jdplang.ankiPhrase",
-    "onCustomEditor:jdplang.langText",
     "onCommand:jdplang.ankiPhrase.new",
+    "onCommand:jdplang.ankiPhrase.setLanguage",
+    "onCustomEditor:jdplang.langText",
     "onCommand:jdplang.langText.new",
     "onView:jdplang.sidebar"
   ],
@@ -45,13 +46,13 @@
         "category": "JdpLang"
       },
       {
-        "command": "jdplang.langText.new",
-        "title": "Create new LangText document",
+        "command": "jdplang.ankiPhrase.setLanguage",
+        "title": "Set language for Anki Phrase document",
         "category": "JdpLang"
       },
       {
-        "command": "jdplang.ankiPhrase.pickLang",
-        "title": "Pick language for Anki Phrase document",
+        "command": "jdplang.langText.new",
+        "title": "Create new LangText document",
         "category": "JdpLang"
       }
     ],

@@ -1,15 +1,18 @@
 import * as vscode from 'vscode';
-import { getNonce } from './util';
+import { getNonce, LocalStorageService, StorageKey  } from './util';
 
 export class AnkiPhraseEditorProvider implements vscode.CustomTextEditorProvider {
 
-    private static newFileId = 1;
-
 	private static readonly viewType = 'jdplang.ankiPhrase';
+    private static newFileId = 1;
+    private storageManager: LocalStorageService;
+    private _view?: vscode.WebviewPanel;
 
 	constructor(
 		private readonly context: vscode.ExtensionContext
-	) { }
+	) { 
+    	this.storageManager = new LocalStorageService(context.workspaceState);
+	}
 
 	public static register(context: vscode.ExtensionContext): vscode.Disposable {
 
@@ -28,36 +31,12 @@ export class AnkiPhraseEditorProvider implements vscode.CustomTextEditorProvider
 			vscode.commands.executeCommand('vscode.openWith', uri, AnkiPhraseEditorProvider.viewType);
 		});
 
-		vscode.commands.registerCommand('jdplang.ankiPhrase.pickLang', async () => {
-			const langcodes = [
-				'apc',
-				'arb',
-				'arz',
-				'bul',
-				'ces',
-				'cmn',
-				'deu',
-				'ell',
-				'fas',
-				'fra',
-				'heb',
-				'hin',
-				'hye',
-				'ind',
-				'kaz',
-				'rus',
-				'spa',
-				'srp',
-				'tgk',
-				'tur',
-				'uig',
-				'uzb',
-				'vie'
-			];
-			const langcode = await vscode.window.showQuickPick(langcodes);
-			if (langcode != undefined) {
-				vscode.window.showInformationMessage(`Set language: ${langcode}`);
+		vscode.commands.registerCommand('jdplang.ankiPhrase.setLanguage', async (langcode) => {
+			const { activeTextEditor } = vscode.window;
+			if (!activeTextEditor) {
+				return;
 			}
+			console.log("EXEC COMMAND WITH PARAM " + langcode);
 		});
 
 		const provider = new AnkiPhraseEditorProvider(context);
@@ -71,6 +50,7 @@ export class AnkiPhraseEditorProvider implements vscode.CustomTextEditorProvider
 		webviewPanel: vscode.WebviewPanel,
 		_token: vscode.CancellationToken
 	): Promise<void> {
+        this._view = webviewPanel;
 		
 		webviewPanel.webview.options = {
 			enableScripts: true,
@@ -94,8 +74,17 @@ export class AnkiPhraseEditorProvider implements vscode.CustomTextEditorProvider
 			changeDocumentSubscription.dispose();
 		});
 
-		webviewPanel.webview.onDidReceiveMessage(e => {
-			switch (e.type) {
+		webviewPanel.webview.onDidReceiveMessage(async (msg) => {
+			switch (msg.type) {
+
+                case "getLanguage": {
+                    const langcode = this.storageManager.getValue<string>(StorageKey.langcode);
+                    if (langcode != undefined) {
+                        this._view?.webview.postMessage({type: 'setLanguage', data: langcode});
+                    }
+                    break;
+                }
+
 				// case 'add':
 				// 	this.addNewPhrase(document);
 				// 	return;
@@ -146,6 +135,9 @@ export class AnkiPhraseEditorProvider implements vscode.CustomTextEditorProvider
 				<title>Anki Phrase</title>
 			</head>
 			<body>
+				<script nonce="${nonce}">
+					const vscode = acquireVsCodeApi();
+				</script>
                 <script nonce="${nonce}" src="${scriptUri}"></script>
 			</body>
 			</html>`;

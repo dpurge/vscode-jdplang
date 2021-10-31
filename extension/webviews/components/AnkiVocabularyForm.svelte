@@ -1,5 +1,6 @@
 <script lang='ts'>
     import { onMount } from 'svelte';
+    import { setIme, loadIme, onKeyDown, onKeyUp, onKeyPress } from './IME.svelte';
 
     export let langcode: string;
     export let data: AnkiPhrase[] = [];
@@ -48,82 +49,19 @@
         clearForm();
     }
 
-    function onKeyDown(this:HTMLInputElement, event: KeyboardEvent) {
-        //if (this.ime == null) return;
-        const key = event.key;
-        switch(key) {
-        case 'Shift':
-            this.state.shift = true;
-            break;
-        case 'Control':
-            this.state.ctrl = true;
-            break;
-        case 'Alt':
-            this.state.alt = true;
-            break;
-        //default:
-            //console.log(key);
-        }
-    }
-
-    function onKeyUp(this:HTMLInputElement, event: KeyboardEvent) {
-        //if (this.ime == null) return;
-        const key = event.key;
-        switch(key) {
-        case 'Shift':
-            this.state.shift = false;
-            break;
-        case 'Control':
-            this.state.ctrl = false;
-            break;
-        case 'Alt':
-            this.state.alt = false;
-            break;
-        //default:
-            // code block
-        }
-    }
-
-    function onKeyPress(this:HTMLInputElement, event: KeyboardEvent) {
-        if (this.ime == null) return;
-        event.preventDefault();
-
-        var { key } = event;
-        var { selectionStart, selectionEnd }  = this;
-            
-        let prefix = this.value.substring(0, selectionStart!);
-        let suffix = this.value.substring(selectionEnd!, this.value.length);
-
-        for (let i of this.ime) {
-            
-            if (!i[0].endsWith(key)) continue;
-            // if (this.state.alt != i[2]) continue;
-            //if (this.state.ctrl != i[3]) continue;
-            const context = i[0].slice(0, -1);
-            if (!prefix.endsWith(context)) continue;
-            
-            prefix = prefix.substring(0, prefix.length - context.length);
-            key = i[1];
-        }
-        this.value = prefix + key + suffix;
-        this.selectionStart = this.value.length - suffix.length;
-        this.selectionEnd = this.selectionStart;
-    }
-
-    function setIme(elem: HTMLInputElement, ime: Array<[string, string]>|null) {
-        elem.ime = ime;
-        elem.state = {shift:false, alt:false, ctrl:false};
-        // elem.onkeydown = onKeyDown;
-        // elem.onkeypress = onKeyPress;
-        // elem.onkeyup = onKeyUp;
-    }
-
     function setLang(code: string) {
         switch (code) {
             case 'arb': {
                 style = 'arab';
-                setIme(phrase, [['a','A']]);
-                setIme(transcription, [['b','B']]);
+                setIme(phrase, loadIme(code, 'phrase'));
+                setIme(transcription, loadIme(code, 'transcription'));
+                break;
+            }
+
+            case 'vie': {
+                style = 'latn';                
+                setIme(phrase, loadIme(code, 'phrase'));
+                setIme(transcription, loadIme(code, 'transcription'));
                 break;
             }
 

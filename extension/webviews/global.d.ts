@@ -1,14 +1,23 @@
 /// <reference types="svelte" />
+import * as _vscode from "vscode";
 
-interface AnkiPhrase {
-    phrase: string;
-    grammar: string;
-    transcription: string;
-    translation: string;
-    notes: string;
-}
+declare global {
+    type AnkiPhrase = {
+        phrase: string;
+        grammar: string;
+        transcription: string;
+        translation: string;
+        notes: string;
+    }
 
-interface HTMLInputElement {
-    ime : Array<[string, string]> | null;
-    state : {shift:boolean, alt:boolean, ctrl:boolean};
+    type ImeData = Array<[string, string]> | null;
+
+    interface HTMLInputElement {
+        ime : ImeData;
+        state : {shift:boolean, alt:boolean, ctrl:boolean};
+    }
+
+    const vscode: {
+        postMessage: ({type: string, data: any}) => void
+    };
 }
