@@ -1,0 +1,18 @@
+{
+	"Header": {
+		"prefix": "---",
+		"body": [
+            "---",
+            "ready: true",
+            "template: text",
+            "style: default",
+            "lang: $1",
+            "---",
+            "",
+            "# $2",
+            "",
+            "$3"
+		],
+		"description": "LangText header"
+	}
+}
