@@ -85,6 +85,19 @@ export class AnkiPhraseEditorProvider implements vscode.CustomTextEditorProvider
                     break;
                 }
 
+                case "changeLanguage": {
+                    if (!msg.data) {
+                      return;
+                    }
+                    const langcode = await vscode.window.showQuickPick(msg.data);
+                    if (langcode != undefined) {
+                        this.storageManager.setValue<string>(StorageKey.langcode, langcode);
+                        this._view?.webview.postMessage({type: 'setLanguage', data: langcode});
+                    }
+                    break;
+                }
+
+
 				// case 'add':
 				// 	this.addNewPhrase(document);
 				// 	return;

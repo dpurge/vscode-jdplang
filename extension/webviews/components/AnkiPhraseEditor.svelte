@@ -22,10 +22,12 @@
         vscode.postMessage({type: 'getLanguage', data: null});
     });
 
-    
+    function changeLanguage() {
+        vscode.postMessage({type: 'changeLanguage', data: Object.keys(LangName) });
+    }
 </script>
 
-<h1>Add anki phrase: { LangName[langcode] }</h1>
+<h1>Add anki phrase: <a href="#" on:click={ changeLanguage }>{ LangName[langcode] }</a></h1>
 
 <div class="container">
     <AnkiVocabularyForm bind:data={data} langcode={langcode} />

@@ -1,8 +1,8 @@
 <script lang='ts' context="module">
     export enum LangName {
-        'apc' = '',
+        'apc' = '???',
         'arb' = 'Arabic',
-        'arz' = '',
+        'arz' = '???',
         'bul' = 'Bulgarian',
         'ces' = 'Czech',
         'cmn' = 'Mandarin',
