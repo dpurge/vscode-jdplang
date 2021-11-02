@@ -26,17 +26,6 @@
         'vie' = 'Vietnamese'
     }
 
-    export enum ImeType {
-        'phrase',
-        'transcription'
-    }
-
-    export enum ImeUrl {
-        'buckwalter' = 'https://xxx.example',
-        'banan' = 'https://xxx.example',
-        'semitic' = 'https://xxx.example'
-    }
-
     export function onKeyDown(this:HTMLInputElement, event: KeyboardEvent) {
         //if (this.ime == null) return;
         const key = event.key;
@@ -102,25 +91,5 @@
     export function setIme(elem: HTMLInputElement, ime: ImeData) {
         elem.ime = ime;
         elem.state = {shift:false, alt:false, ctrl:false};
-        // elem.onkeydown = onKeyDown;
-        // elem.onkeypress = onKeyPress;
-        // elem.onkeyup = onKeyUp;
-        //vscode.postMessage({type: 'showInfo', data: `setIme = ${ime}`});
     }
-
-    // export function loadIme(
-    //     langcode: keyof typeof LangName,
-    //     imeType: keyof typeof ImeType
-    // ): ImeData {
-    //     // var urly = 'media/ime/example.json';
-    //     // console.log("Fetching data...")      
-    //     // fetch(urly)
-    //     //     .then(res => res.json())
-    //     //     .then(data => {
-    //     //     console.log(data)
-    //     //     });
-        
-    //     const data: ImeData = [['a','A'], ['b','B']];
-    //     return data;
-    // }
 </script>
