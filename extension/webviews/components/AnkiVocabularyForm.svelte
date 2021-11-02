@@ -1,8 +1,8 @@
 <script lang='ts'>
     import { onMount } from 'svelte';
-    import { setIme, loadIme, onKeyDown, onKeyUp, onKeyPress } from './IME.svelte';
+    import { setIme, onKeyDown, onKeyUp, onKeyPress, LangName } from './IME.svelte';
 
-    export let langcode: string;
+    export let langcode: keyof typeof LangName;
     export let data: AnkiPhrase[] = [];
 
     let phrase: HTMLInputElement;
@@ -14,7 +14,25 @@
     let style: string = 'latn';
 
 	onMount(() => {
-        setLang(langcode);
+        setupLanguage();
+
+        window.addEventListener("message", (event) => {
+            const msg = event.data;
+            switch (msg.type) {
+                case "setIme": {
+                    const element: string = msg.data.element;
+                    switch (element) {
+                        case 'phrase': {
+                            setIme(phrase, msg.data.ime);
+                        }
+                        case 'transcription': {
+                            setIme(transcription, msg.data.ime);
+                        }
+                    }
+                    break;
+                }
+            }
+        });
     });
 
     function clearForm()
@@ -38,7 +56,7 @@
             translation: translation.value,
             notes: notes.value
         }
-        
+        appendDocumentItem(item);
         data = [...data, item];
         clearForm();
     }
@@ -49,29 +67,41 @@
         clearForm();
     }
 
-    function setLang(code: string) {
-        switch (code) {
-            case 'arb': {
-                style = 'arab';
-                setIme(phrase, loadIme(code, 'phrase'));
-                setIme(transcription, loadIme(code, 'transcription'));
-                break;
-            }
+    function setupLanguage() {
+        if (langcode != undefined) {
+            switch (langcode) {
+                case 'arb': {
+                    style = 'arab';
+                    vscode.postMessage({type: 'getIme', data: {element: "phrase", ime: "arb-phrase"}});
+                    vscode.postMessage({type: 'getIme', data: {element: "transcription", ime: "arb-transcription"}});
+                    break;
+                }
 
-            case 'vie': {
-                style = 'latn';                
-                setIme(phrase, loadIme(code, 'phrase'));
-                setIme(transcription, loadIme(code, 'transcription'));
-                break;
-            }
+                case 'vie': {
+                    style = 'latn';
+                    vscode.postMessage({type: 'getIme', data: {element: "phrase", ime: "example"}});
+                    vscode.postMessage({type: 'getIme', data: {element: "transcription", ime: "example"}}); 
+                    break;
+                }
 
-            default: {
-                style = 'latn';
-                setIme(phrase, null);
-                setIme(transcription, null);
-                break;
+                default: {
+                    style = 'latn';
+                    setIme(phrase, null);
+                    setIme(transcription, null);
+                    break;
+                }
             }
         }
+    }
+
+    function appendDocumentItem(item:AnkiPhrase) {
+		var line = `${item.phrase}\t${item.grammar}\t${item.transcription}\t${item.translation}\t${item.notes}\n`;
+        vscode.postMessage({type: 'appendLine', data: line});
+    }
+
+    $: {
+        console.log(`langcode = ${langcode}`);
+        setupLanguage();
     }
 </script>
 

@@ -12,10 +12,8 @@
   "activationEvents": [
     "onCustomEditor:jdplang.ankiPhrase",
     "onCommand:jdplang.ankiPhrase.new",
-    "onCommand:jdplang.ankiPhrase.setLanguage",
     "onCustomEditor:jdplang.langText",
-    "onCommand:jdplang.langText.new",
-    "onView:jdplang.sidebar"
+    "onCommand:jdplang.langText.new"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -27,7 +25,8 @@
           {
             "filenamePattern": "*.csv"
           }
-        ]
+        ],
+        "priority": "option"
       },
       {
         "viewType": "jdplang.langText",
@@ -46,11 +45,6 @@
         "category": "JdpLang"
       },
       {
-        "command": "jdplang.ankiPhrase.setLanguage",
-        "title": "Set language for Anki Phrase document",
-        "category": "JdpLang"
-      },
-      {
         "command": "jdplang.langText.new",
         "title": "Create new LangText document",
         "category": "JdpLang"
@@ -61,27 +55,7 @@
 				"language": "markdown",
 				"path": "./snippet/md.json"
 			}
-		],
-    "viewsContainers": {
-      "activitybar": [
-        {
-          "id": "jdplang-sidebar-view",
-          "title": "JdpLang",
-          "icon": "media/JdpLang.svg"
-        }
-      ]
-    },
-    "views": {
-      "jdplang-sidebar-view": [
-        {
-          "type": "webview",
-          "id": "jdplang.sidebar",
-          "name": "JdpLang",
-          "icon": "media/JdpLang.svg",
-          "contextualTitle": "JdpLang"
-        }
-      ]
-    }
+		]
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",

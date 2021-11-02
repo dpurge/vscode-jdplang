@@ -24,19 +24,11 @@ export class AnkiPhraseEditorProvider implements vscode.CustomTextEditorProvider
 			}
 
 			const uri = vscode.Uri.joinPath(
-                workspaceFolders[0].uri, 'src', 'data', 'lang',
+                workspaceFolders[0].uri,
                 `new-${AnkiPhraseEditorProvider.newFileId++}.csv`)
 				    .with({ scheme: 'untitled' });
 
 			vscode.commands.executeCommand('vscode.openWith', uri, AnkiPhraseEditorProvider.viewType);
-		});
-
-		vscode.commands.registerCommand('jdplang.ankiPhrase.setLanguage', async (langcode) => {
-			const { activeTextEditor } = vscode.window;
-			if (!activeTextEditor) {
-				return;
-			}
-			console.log("EXEC COMMAND WITH PARAM " + langcode);
 		});
 
 		const provider = new AnkiPhraseEditorProvider(context);
@@ -59,8 +51,8 @@ export class AnkiPhraseEditorProvider implements vscode.CustomTextEditorProvider
 
 		function updateWebview() {
 			webviewPanel.webview.postMessage({
-				type: 'update',
-				text: document.getText(),
+				type: 'updateData',
+				data: document.getText(),
 			});
 		}
 
@@ -97,14 +89,60 @@ export class AnkiPhraseEditorProvider implements vscode.CustomTextEditorProvider
                     break;
                 }
 
+                case "getIme": {
+                    if (!msg.data) {
+                      return;
+                    }
+					const element = msg.data.element;
+					const imeName = msg.data.ime;
+					const ime = require(`../media/ime/${imeName}.json`);
+                    if (ime != undefined) {
+                        this._view?.webview.postMessage({type: 'setIme', data: {element: element, ime: ime}});
+                    }
+                    break;
+                }
 
-				// case 'add':
-				// 	this.addNewPhrase(document);
-				// 	return;
+				case "changeLine": {
+                    if (!msg.data) {
+						vscode.window.showErrorMessage('[Internal error] Editor sent command to change line without data!');
+                      	return;
+                    }
+					this.changeDocumentLine(document, msg.data.line, msg.data.text);
+                    break;
+                }
 
-				// case 'delete':
-				// 	this.deletePhrase(document, e.id);
-				// 	return;
+				case "appendLine": {
+                    if (!msg.data) {
+						vscode.window.showErrorMessage('[Internal error] Editor sent command to append line without data!');
+                      	return;
+                    }
+					this.appendDocumentLine(document, msg.data);
+                    break;
+                }
+
+				case "showInfo": {
+					if (!msg.data) {
+					  return;
+					}
+					vscode.window.showInformationMessage(msg.data);
+                    break;
+                }
+
+				case "showError": {
+					if (!msg.data) {
+					  return;
+					}
+					vscode.window.showErrorMessage(msg.data);
+                    break;
+                }
+
+                case "closeEditor": {
+					if (msg.data) {
+						vscode.window.showErrorMessage(msg.data);
+					}
+                    vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+                    break;
+                }
 			}
 		});
 
@@ -137,8 +175,7 @@ export class AnkiPhraseEditorProvider implements vscode.CustomTextEditorProvider
 				Use a content security policy to only allow loading images from https or from our extension directory,
 				and only allow scripts that have a specific nonce.
 				-->
-				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${webview.cspSource}; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
-
+				<!-- meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${webview.cspSource}; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';" -->
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 				<link href="${styleResetUri}" rel="stylesheet" />
@@ -156,75 +193,28 @@ export class AnkiPhraseEditorProvider implements vscode.CustomTextEditorProvider
 			</html>`;
 	}
 
-	/**
-	 * Add a new phrase to the current document.
-	 */
-	// private addNewPhrase(document: vscode.TextDocument) {
-	// 	const json = this.getDocumentAsJson(document);
-	// 	const character = AnkiPhraseEditorProvider.scratchCharacters[Math.floor(Math.random() * AnkiPhraseEditorProvider.scratchCharacters.length)];
-	// 	json.scratches = [
-	// 		...(Array.isArray(json.scratches) ? json.scratches : []),
-	// 		{
-	// 			id: getNonce(),
-	// 			text: 'xxx',
-	// 			created: Date.now(),
-	// 		}
-	// 	];
+	private appendDocumentLine(document: vscode.TextDocument, text: string) {
+		const edit = new vscode.WorkspaceEdit();
+		edit.insert(
+			document.uri,
+			new vscode.Position(document.lineCount, 0),
+			text);
+		return vscode.workspace.applyEdit(edit);
+	}
 
-	// 	return this.updateTextDocument(document, json);
-	// }
-
-	/**
-	 * Delete an existing phrase from a document.
-	 */
-	// private deletePhrase(document: vscode.TextDocument, id: string) {
-	// 	const json = this.getDocumentAsJson(document);
-	// 	if (!Array.isArray(json.scratches)) {
-	// 		return;
-	// 	}
-
-	// 	json.scratches = json.scratches.filter((note: any) => note.id !== id);
-
-	// 	return this.updateTextDocument(document, json);
-	// }
-
-	private getDocumentData(document: vscode.TextDocument): AnkiPhrase[] {
-		var data:AnkiPhrase[] = [];
-
-		const text = document.getText();
-		if (text.trim().length === 0) {
-			return data;
+	private changeDocumentLine(document: vscode.TextDocument, line: number, text: string) {
+		if (document.lineCount < line + 1) {
+			vscode.window.showErrorMessage(`[Internal error] Document does not have line ${line}`);
 		}
+		const edit = new vscode.WorkspaceEdit();
+		edit.replace(
+			document.uri,
+			new vscode.Range(
+				line, 0,
+				line, document.lineAt(line).text.length),
+			text);
 
-		var lines = text.split("\n");
-
-		var headers = lines[0].split("\t");
-		if (headers.length != 5) {
-			throw new Error('Headers are not valid for anki phrases: ' + lines[0]);
-		}
-		if (headers[0] != 'Phrase') {
-			throw new Error('First field has to be: Phrase');
-		}
-		if (headers[1] != 'Grammar') {
-			throw new Error('Second field has to be: Grammar');
-		}
-
-		for (var i = 1; i < lines.length; i++) {
-			var fields = lines[i].split("\t");
-			if (fields.length != 5) {
-				throw new Error('Line is not valid anki phrase: ' + lines[i]);
-			}
-			var item = {
-				phrase: fields[0].trim(),
-				grammar: fields[1].trim(),
-				transcription: fields[2].trim(),
-				translation: fields[3].trim(),
-				notes: fields[4].trim()
-			}
-			data.push(item);
-		}
-
-		return data;
+		return vscode.workspace.applyEdit(edit);
 	}
 
 	private updateTextDocument(document: vscode.TextDocument, data: any) {

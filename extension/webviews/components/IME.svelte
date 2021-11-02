@@ -105,12 +105,22 @@
         // elem.onkeydown = onKeyDown;
         // elem.onkeypress = onKeyPress;
         // elem.onkeyup = onKeyUp;
+        //vscode.postMessage({type: 'showInfo', data: `setIme = ${ime}`});
     }
 
-    export function loadIme(
-        langcode: keyof typeof LangName,
-        imeType: keyof typeof ImeType
-    ): ImeData {
-        return [['a','A'], ['b','B']];
-    }
+    // export function loadIme(
+    //     langcode: keyof typeof LangName,
+    //     imeType: keyof typeof ImeType
+    // ): ImeData {
+    //     // var urly = 'media/ime/example.json';
+    //     // console.log("Fetching data...")      
+    //     // fetch(urly)
+    //     //     .then(res => res.json())
+    //     //     .then(data => {
+    //     //     console.log(data)
+    //     //     });
+        
+    //     const data: ImeData = [['a','A'], ['b','B']];
+    //     return data;
+    // }
 </script>
