@@ -1,12 +1,13 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import { LangName } from './IME.svelte';
+    import { Language } from './IME.svelte';
 
     import AnkiVocabularyForm from './AnkiVocabularyForm.svelte'
     import AnkiVocabularyList from './AnkiVocabularyList.svelte'
 
-    let langcode: keyof typeof LangName;
+    let langcode: keyof typeof Language = 'spa';
     let data: AnkiPhrase[] = [];
+	let langname: string;
 
     onMount(() => {
         window.addEventListener("message", (event) => {
@@ -28,7 +29,7 @@
     });
 
     function changeLanguage() {
-        vscode.postMessage({type: 'changeLanguage', data: Object.keys(LangName) });
+        vscode.postMessage({type: 'changeLanguage', data: Object.keys(Language) });
     }
 
     
@@ -83,9 +84,11 @@
 
 		return data;
 	}
+
+	$: langname = Language[langcode]?.name;
 </script>
 
-<h1>Add anki phrase: <span on:click={ changeLanguage }>{ LangName[langcode] }</span></h1>
+<h1>Add anki phrase: <span on:click={ changeLanguage }>{ langname }</span></h1>
 
 <div class="container">
     <AnkiVocabularyForm bind:data={data} bind:langcode={langcode} />

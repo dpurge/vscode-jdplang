@@ -1,29 +1,240 @@
 <script lang='ts' context="module">
-    export enum LangName {
-        'apc' = '???',
-        'arb' = 'Arabic',
-        'arz' = '???',
-        'bul' = 'Bulgarian',
-        'ces' = 'Czech',
-        'cmn' = 'Mandarin',
-        'deu' = 'German',
-        'ell' = 'Greek',
-        'fas' = 'Farsi',
-        'fra' = 'French',
-        'heb' = 'Hebrew',
-        'hin' = 'Hindi',
-        'hye' = 'Armenian',
-        'ind' = 'Indonesian',
-        'kaz' = 'Kazakh',
-        'lat' = 'Latin',
-        'rus' = 'Russian',
-        'spa' = 'Spanish',
-        'srp' = 'Serbian',
-        'tgk' = 'Tajik',
-        'tur' = 'Turkish',
-        'uig' = 'Uighur',
-        'uzb' = 'Uzbek',
-        'vie' = 'Vietnamese'
+   
+    export const Language = {
+        'apc': {
+            name: 'North Levantine Arabic',
+            style: 'arab',
+            showTranscription: true,
+            showGrammar: true,
+            phraseIME: '',
+            transcriptionIME: '',
+            grammaticalCategory: ''
+        },
+        'arb': {
+            name: 'Arabic',
+            style: 'arab',
+            showTranscription: true,
+            showGrammar: true,
+            phraseIME: 'arb-phrase',
+            transcriptionIME: 'arb-transcription',
+            grammaticalCategory: 'arb-grammar'
+        },
+        'arz': {
+            name: 'Egyptian Arabic',
+            style: 'arab',
+            showTranscription: true,
+            showGrammar: true,
+            phraseIME: '',
+            transcriptionIME: '',
+            grammaticalCategory: ''
+        },
+        'bul':{
+            name: 'Bulgarian',
+            style: 'cyrl',
+            showTranscription: true,
+            showGrammar: true,
+            phraseIME: 'bul-phrase',
+            transcriptionIME: '',
+            grammaticalCategory: ''
+        },
+        'ces':{
+            name: 'Czech',
+            style: 'latn',
+            showTranscription: true,
+            showGrammar: true,
+            phraseIME: '',
+            transcriptionIME: '',
+            grammaticalCategory: ''
+        },
+        'cmn':{
+            name: 'Mandarin',
+            style: 'hans',
+            showTranscription: true,
+            showGrammar: true,
+            phraseIME: '',
+            transcriptionIME: '',
+            grammaticalCategory: ''
+        },
+        'dan':{
+            name: 'Danish',
+            style: 'latn',
+            showTranscription: true,
+            showGrammar: true,
+            phraseIME: 'dan-phrase',
+            transcriptionIME: '',
+            grammaticalCategory: 'dan-grammar'
+        },
+        'deu':{
+            name: 'German',
+            style: 'latn',
+            showTranscription: true,
+            showGrammar: true,
+            phraseIME: '',
+            transcriptionIME: '',
+            grammaticalCategory: ''
+        },
+        'ell':{
+            name: 'Greek',
+            style: 'grek',
+            showTranscription: true,
+            showGrammar: true,
+            phraseIME: '',
+            transcriptionIME: '',
+            grammaticalCategory: ''
+        },
+        'fas':{
+            name: 'Farsi',
+            style: 'arab',
+            showTranscription: true,
+            showGrammar: true,
+            phraseIME: 'fas-phrase',
+            transcriptionIME: 'fas-transcription',
+            grammaticalCategory: 'fas-grammar'
+        },
+        'fra':{
+            name: 'French',
+            style: 'latn',
+            showTranscription: true,
+            showGrammar: true,
+            phraseIME: '',
+            transcriptionIME: '',
+            grammaticalCategory: ''
+        },
+        'heb':{
+            name: 'Hebrew',
+            style: 'hebr',
+            showTranscription: true,
+            showGrammar: true,
+            phraseIME: 'heb-phrase',
+            transcriptionIME: '',
+            grammaticalCategory: ''
+        },
+        'hin':{
+            name: 'Hindi',
+            style: 'deva',
+            showTranscription: true,
+            showGrammar: true,
+            phraseIME: '',
+            transcriptionIME: '',
+            grammaticalCategory: ''
+        },
+        'hun':{
+            name: 'Hungarian',
+            style: 'latn',
+            showTranscription: true,
+            showGrammar: true,
+            phraseIME: 'hun-phrase',
+            transcriptionIME: null,
+            grammaticalCategory: ''
+        },
+        'hye':{
+            name: 'Armenian',
+            style: 'armn',
+            showTranscription: true,
+            showGrammar: true,
+            phraseIME: '',
+            transcriptionIME: '',
+            grammaticalCategory: ''
+        },
+        'ind':{
+            name: 'Indonesian',
+            style: 'latn',
+            showTranscription: false,
+            showGrammar: true,
+            phraseIME: null,
+            transcriptionIME: null,
+            grammaticalCategory: ''
+        },
+        'kaz':{
+            name: 'Kazakh',
+            style: 'cyrl',
+            showTranscription: true,
+            showGrammar: true,
+            phraseIME: '',
+            transcriptionIME: '',
+            grammaticalCategory: ''
+        },
+        'lat':{
+            name: 'Latin',
+            style: 'latn',
+            showTranscription: false,
+            showGrammar: true,
+            phraseIME: '',
+            transcriptionIME: '',
+            grammaticalCategory: ''
+        },
+        'rus':{
+            name: 'Russian',
+            style: 'cyrl',
+            showTranscription: true,
+            showGrammar: true,
+            phraseIME: '',
+            transcriptionIME: '',
+            grammaticalCategory: ''
+        },
+        'spa':{
+            name: 'Spanish',
+            style: 'latn',
+            showTranscription: true,
+            showGrammar: true,
+            phraseIME: '',
+            transcriptionIME: '',
+            grammaticalCategory: ''
+        },
+        'srp':{
+            name: 'Serbian',
+            style: 'cyrl',
+            showTranscription: true,
+            showGrammar: true,
+            phraseIME: '',
+            transcriptionIME: '',
+            grammaticalCategory: ''
+        },
+        'tgk':{
+            name: 'Tajik',
+            style: 'cyrl',
+            showTranscription: true,
+            showGrammar: true,
+            phraseIME: '',
+            transcriptionIME: '',
+            grammaticalCategory: ''
+        },
+        'tur':{
+            name: 'Turkish',
+            style: 'latn',
+            showTranscription: true,
+            showGrammar: true,
+            phraseIME: '',
+            transcriptionIME: '',
+            grammaticalCategory: ''
+        },
+        'uig':{
+            name: 'Uighur',
+            style: 'arab',
+            showTranscription: true,
+            showGrammar: true,
+            phraseIME: '',
+            transcriptionIME: '',
+            grammaticalCategory: ''
+        },
+        'uzb':{
+            name: 'Uzbek',
+            style: 'latn',
+            showTranscription: true,
+            showGrammar: true,
+            phraseIME: '',
+            transcriptionIME: '',
+            grammaticalCategory: ''
+        },
+        'vie':{
+            name: 'Vietnamese',
+            style: 'latn',
+            showTranscription: false,
+            showGrammar: false,
+            phraseIME: 'vie-phrase',
+            transcriptionIME: null,
+            grammaticalCategory: ''
+        }
     }
 
     export function onKeyDown(this:HTMLInputElement, event: KeyboardEvent) {

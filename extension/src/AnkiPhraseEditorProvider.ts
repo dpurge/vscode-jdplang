@@ -102,6 +102,18 @@ export class AnkiPhraseEditorProvider implements vscode.CustomTextEditorProvider
                     break;
                 }
 
+                case "getGrammaticalCategory": {
+                    if (!msg.data) {
+                      return;
+                    }
+					const categoryName = msg.data;
+					const grammaticalCategory = require(`../media/ime/${categoryName}.json`);
+                    if (grammaticalCategory != undefined) {
+                        this._view?.webview.postMessage({type: 'setGrammaticalCategory', data: grammaticalCategory });
+                    }
+                    break;
+                }
+
 				case "changeLine": {
                     if (!msg.data) {
 						vscode.window.showErrorMessage('[Internal error] Editor sent command to change line without data!');
@@ -217,30 +229,30 @@ export class AnkiPhraseEditorProvider implements vscode.CustomTextEditorProvider
 		return vscode.workspace.applyEdit(edit);
 	}
 
-	private updateTextDocument(document: vscode.TextDocument, data: any) {
-		var buffer = "Phrase\tGrammar\tTranscription\tTranslation\tNotes\n";
-		for (let i of data) {
-			buffer += i.phrase;
-			buffer += "\t";
-			buffer += i.grammar;
-			buffer += "\t";
-			buffer += i.transcription;
-			buffer += "\t";
-			buffer += i.translation;
-			buffer += "\t";
-			buffer += i.notes;
-			buffer += "\n";
-		}
+	// private updateTextDocument(document: vscode.TextDocument, data: any) {
+	// 	var buffer = "Phrase\tGrammar\tTranscription\tTranslation\tNotes\n";
+	// 	for (let i of data) {
+	// 		buffer += i.phrase;
+	// 		buffer += "\t";
+	// 		buffer += i.grammar;
+	// 		buffer += "\t";
+	// 		buffer += i.transcription;
+	// 		buffer += "\t";
+	// 		buffer += i.translation;
+	// 		buffer += "\t";
+	// 		buffer += i.notes;
+	// 		buffer += "\n";
+	// 	}
 
-		const edit = new vscode.WorkspaceEdit();
+	// 	const edit = new vscode.WorkspaceEdit();
 
-		// Replace the entire document every time.
-		// A better extension should compute minimal edits instead.
-		edit.replace(
-			document.uri,
-			new vscode.Range(0, 0, document.lineCount, 0),
-			buffer);
+	// 	// Replace the entire document every time.
+	// 	// A better extension should compute minimal edits instead.
+	// 	edit.replace(
+	// 		document.uri,
+	// 		new vscode.Range(0, 0, document.lineCount, 0),
+	// 		buffer);
 
-		return vscode.workspace.applyEdit(edit);
-	}
+	// 	return vscode.workspace.applyEdit(edit);
+	// }
 }

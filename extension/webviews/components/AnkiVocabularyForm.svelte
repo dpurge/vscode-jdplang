@@ -1,9 +1,11 @@
 <script lang='ts'>
     import { onMount } from 'svelte';
-    import { setIme, onKeyDown, onKeyUp, onKeyPress, LangName } from './IME.svelte';
+    import { setIme, onKeyDown, onKeyUp, onKeyPress, Language } from './IME.svelte';
 
-    export let langcode: keyof typeof LangName;
+    export let langcode: keyof typeof Language;
     export let data: AnkiPhrase[] = [];
+
+    let grammaticalCategory: string[] = [];
 
     let phrase: HTMLInputElement;
     let grammar: HTMLInputElement;
@@ -12,9 +14,11 @@
     let notes: HTMLTextAreaElement;
 
     let style: string = 'latn';
+    let showTranscription = true;
+    let showGrammar = true;
 
 	onMount(() => {
-        setupLanguage();
+        // setupLanguage();
 
         window.addEventListener("message", (event) => {
             const msg = event.data;
@@ -29,6 +33,11 @@
                             setIme(transcription, msg.data.ime);
                         }
                     }
+                    break;
+                }
+
+                case "setGrammaticalCategory": {
+                    grammaticalCategory = msg.data;
                     break;
                 }
             }
@@ -67,30 +76,39 @@
         clearForm();
     }
 
-    function setupLanguage() {
-        if (langcode != undefined) {
-            switch (langcode) {
-                case 'arb': {
-                    style = 'arab';
-                    vscode.postMessage({type: 'getIme', data: {element: "phrase", ime: "arb-phrase"}});
-                    vscode.postMessage({type: 'getIme', data: {element: "transcription", ime: "arb-transcription"}});
-                    break;
-                }
+    export function setupLanguage(code: keyof typeof Language) {
+        
+        style = Language[code].style;
+        showTranscription = Language[code].showTranscription;
+        showGrammar= Language[code].showGrammar;
 
-                case 'vie': {
-                    style = 'latn';
-                    vscode.postMessage({type: 'getIme', data: {element: "phrase", ime: "example"}});
-                    vscode.postMessage({type: 'getIme', data: {element: "transcription", ime: "example"}}); 
-                    break;
-                }
+        if (showGrammar && Language[code].grammaticalCategory) {
+            vscode.postMessage({
+                type: 'getGrammaticalCategory',
+                data: Language[code].grammaticalCategory
+            });
+        }
 
-                default: {
-                    style = 'latn';
-                    setIme(phrase, null);
-                    setIme(transcription, null);
-                    break;
-                }
-            }
+        const phraseIME = Language[code].phraseIME;
+        if (phraseIME) {
+            vscode.postMessage({
+                type: 'getIme',
+                data: {
+                    element: "phrase",
+                    ime: phraseIME}});
+        } else {
+            if (phrase) { setIme(phrase, null); }
+        };
+        
+        const transcriptionIME = Language[code].transcriptionIME;
+        if (transcriptionIME) {
+            vscode.postMessage({
+                type: 'getIme',
+                data: {
+                    element: "transcription",
+                    ime: transcriptionIME}});
+        } else {
+            if (transcription) { setIme(transcription, null); }
         }
     }
 
@@ -99,10 +117,7 @@
         vscode.postMessage({type: 'appendLine', data: line});
     }
 
-    $: {
-        console.log(`langcode = ${langcode}`);
-        setupLanguage();
-    }
+    $: setupLanguage(langcode);
 </script>
 
 <form>
@@ -120,18 +135,18 @@
     type="text"
     id="grammar"
     name="Grammar"
-    placeholder="Part of speech...">
+    placeholder="Grammatical category...">
 <datalist id="grammaticalCategory">
-    <option value="Internet Explorer">
-    <option value="Firefox">
-    <option value="Google Chrome">
-    <option value="Opera">
-    <option value="Safari">
+    {#each grammaticalCategory as item}
+    <option value="{item}">
+    {/each}
 </datalist>
 
 
 <!-- label for="transcription">Transcription</label -->
-<input bind:this={transcription} class="latn" on:keydown={onKeyDown} on:keyup={onKeyUp} on:keypress={onKeyPress}
+<input bind:this={transcription} class="latn"
+    on:keydown={onKeyDown} on:keyup={onKeyUp} on:keypress={onKeyPress}
+    style="display:{showTranscription?'block':'none'};"
     type="text"
     id="transcription"
     name="Transcription"
