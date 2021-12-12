@@ -18,13 +18,14 @@
                     break;
                 }
 
-                case "updateData": {
+                case "setDocument": {
                     data = getDocumentData(msg.data);
                     break;
                 }
             }
         });
 
+		vscode.postMessage({type: 'getDocument', data: null});
         vscode.postMessage({type: 'getLanguage', data: null});
     });
 

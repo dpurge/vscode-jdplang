@@ -17,6 +17,11 @@ declare global {
         state : {shift:boolean, alt:boolean, ctrl:boolean};
     }
 
+    interface HTMLTextAreaElement {
+        ime : ImeData;
+        state : {shift:boolean, alt:boolean, ctrl:boolean};
+    }
+
     const vscode: {
         postMessage: ({type: string, data: any}) => void
     };

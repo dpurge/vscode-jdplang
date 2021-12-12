@@ -51,7 +51,7 @@ export class AnkiPhraseEditorProvider implements vscode.CustomTextEditorProvider
 
 		function updateWebview() {
 			webviewPanel.webview.postMessage({
-				type: 'updateData',
+				type: 'setDocument',
 				data: document.getText(),
 			});
 		}
@@ -68,6 +68,14 @@ export class AnkiPhraseEditorProvider implements vscode.CustomTextEditorProvider
 
 		webviewPanel.webview.onDidReceiveMessage(async (msg) => {
 			switch (msg.type) {
+
+                case "getDocument": {
+                    this._view?.webview.postMessage({
+						type: 'setDocument',
+						data: document.getText()
+					});
+                    break;
+                }
 
                 case "getLanguage": {
                     const langcode = this.storageManager.getValue<string>(StorageKey.langcode);

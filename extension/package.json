@@ -35,7 +35,8 @@
           {
             "filenamePattern": "*.md"
           }
-        ]
+        ],
+        "priority": "option"
       }
     ],
     "commands": [

@@ -1,15 +1,18 @@
 import * as vscode from 'vscode';
-import { getNonce } from './util';
+import { getNonce, LocalStorageService, StorageKey  } from './util';
 
 export class LangTextEditorProvider implements vscode.CustomTextEditorProvider {
 
-    private static newFileId = 1;
-
 	private static readonly viewType = 'jdplang.langText';
+    private static newFileId = 1;
+    private storageManager: LocalStorageService;
+    private _view?: vscode.WebviewPanel;
 
 	constructor(
 		private readonly context: vscode.ExtensionContext
-	) { }
+	) { 
+    	this.storageManager = new LocalStorageService(context.workspaceState);
+	}
 
     public static register(context: vscode.ExtensionContext): vscode.Disposable {
 
@@ -38,6 +41,7 @@ export class LangTextEditorProvider implements vscode.CustomTextEditorProvider {
 		webviewPanel: vscode.WebviewPanel,
 		_token: vscode.CancellationToken
 	): Promise<void> {
+        this._view = webviewPanel;
 		
 		webviewPanel.webview.options = {
 			enableScripts: true,
@@ -46,8 +50,8 @@ export class LangTextEditorProvider implements vscode.CustomTextEditorProvider {
 
 		function updateWebview() {
 			webviewPanel.webview.postMessage({
-				type: 'update',
-				text: document.getText(),
+				type: 'setDocument',
+				data: document.getText(),
 			});
 		}
 
@@ -61,15 +65,69 @@ export class LangTextEditorProvider implements vscode.CustomTextEditorProvider {
 			changeDocumentSubscription.dispose();
 		});
 
-		webviewPanel.webview.onDidReceiveMessage(e => {
-			switch (e.type) {
-				// case 'add':
-				// 	this.addNewPhrase(document);
-				// 	return;
+		webviewPanel.webview.onDidReceiveMessage(async (msg) => {
+			switch (msg.type) {
 
-				// case 'delete':
-				// 	this.deletePhrase(document, e.id);
-				// 	return;
+                case "getLanguage": {
+                    const langcode = this.storageManager.getValue<string>(StorageKey.langcode);
+                    if (langcode != undefined) {
+                        this._view?.webview.postMessage({type: 'setLanguage', data: langcode});
+                    }
+                    break;
+                }
+
+                case "changeLanguage": {
+                    if (!msg.data) {
+                      return;
+                    }
+                    const langcode = await vscode.window.showQuickPick(msg.data);
+                    if (langcode != undefined) {
+                        this.storageManager.setValue<string>(StorageKey.langcode, langcode);
+                        this._view?.webview.postMessage({type: 'setLanguage', data: langcode});
+                    }
+                    break;
+                }
+
+                case "changeImeType": {
+                    if (!msg.data) {
+                      return;
+                    }
+                    const imeType = await vscode.window.showQuickPick(msg.data);
+                    if (imeType != undefined) {
+                        //this.storageManager.setValue<string>(StorageKey.imeType, imeType);
+                        this._view?.webview.postMessage({type: 'setImeType', data: imeType});
+                    }
+                    break;
+                }
+
+                case "getIme": {
+                    if (!msg.data) {
+                      return;
+                    }
+					const imeName = msg.data;
+					const ime = require(`../media/ime/${imeName}.json`);
+                    if (ime != undefined) {
+                        this._view?.webview.postMessage({type: 'setIme', data: ime});
+                    }
+                    break;
+                }
+
+                case "getDocument": {
+                    this._view?.webview.postMessage({
+						type: 'setDocument',
+						data: document.getText()
+					});
+                    break;
+                }
+
+				case "updateDocument": {
+                    if (!msg.data) {
+						vscode.window.showErrorMessage('[Internal error] Editor sent command to update document without data!');
+                      	return;
+                    }
+					this.updateDocument(document, msg.data);
+                    break;
+                }
 			}
 		});
 
@@ -113,8 +171,23 @@ export class LangTextEditorProvider implements vscode.CustomTextEditorProvider {
 				<title>Anki Phrase</title>
 			</head>
 			<body>
+				<script nonce="${nonce}">
+					const vscode = acquireVsCodeApi();
+				</script>
                 <script nonce="${nonce}" src="${scriptUri}"></script>
 			</body>
 			</html>`;
+	}
+
+	private updateDocument(document: vscode.TextDocument, data: string) {
+		const edit = new vscode.WorkspaceEdit();
+
+		// Replace the entire document every time.
+		// A better extension should compute minimal edits instead.
+		edit.replace(
+			document.uri,
+			new vscode.Range(0, 0, document.lineCount, 0),
+			data);
+		return vscode.workspace.applyEdit(edit);
 	}
 }

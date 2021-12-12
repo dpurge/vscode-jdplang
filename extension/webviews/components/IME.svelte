@@ -274,10 +274,11 @@
     }
 
     export function onKeyPress(this:HTMLInputElement, event: KeyboardEvent) {
-        if (this.ime == null) return;
-        event.preventDefault();
-
         var { key } = event;
+        if (this.ime == null) return;
+        if (key === "Enter") return;
+        event.preventDefault();
+        
         var { selectionStart, selectionEnd }  = this;
             
         let prefix = this.value.substring(0, selectionStart!);
@@ -299,7 +300,7 @@
         this.selectionEnd = this.selectionStart;
     }
 
-    export function setIme(elem: HTMLInputElement, ime: ImeData) {
+    export function setIme(elem: HTMLInputElement|HTMLTextAreaElement, ime: ImeData) {
         elem.ime = ime;
         elem.state = {shift:false, alt:false, ctrl:false};
     }
