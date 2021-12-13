@@ -31,6 +31,56 @@ export class LangTextEditorProvider implements vscode.CustomTextEditorProvider {
 			vscode.commands.executeCommand('vscode.openWith', uri, LangTextEditorProvider.viewType);
 		});
 
+		vscode.commands.registerCommand('jdplang.langText.convertSelectionToVocabulary', () => {
+			const {activeTextEditor} = vscode.window;
+			if (!activeTextEditor) {
+				vscode.window.showErrorMessage("No active text editor!");
+				return;
+			}
+			const document = activeTextEditor.document;
+			const selection = activeTextEditor.selection;
+
+			const text = document.getText(selection);
+			if (text.length === 0) {
+				return;
+			}
+			let vocabulary = '';
+
+			var lines = text.split("\n");
+			for (var i = 1; i < lines.length; i++) {
+				if (lines[i].trim().length === 0) {
+					continue;
+				}
+				var fields = lines[i].split("\t");
+				if (fields.length != 5) {
+					vscode.window.showErrorMessage("Incorrect number of fields: " + fields.join(' | '));
+				}
+
+				const phrase = fields[0].trim()
+				const grammar = fields[1].trim()
+				const transcription = fields[2].trim()
+				const translation = fields[3].trim()
+				const notes = fields[4].trim()
+
+				vocabulary += phrase + "\n:";
+				if (grammar) {
+					vocabulary += ' {' + grammar + "}";
+				}
+				if (transcription) {
+					vocabulary += ' [' + transcription+ "]";
+				}
+				vocabulary += ' ' + translation;
+				if (notes) {
+					vocabulary += ' (' + notes + ")";
+				}
+				vocabulary += "\n\n";
+			}
+
+			const edit = new vscode.WorkspaceEdit();
+			edit.replace(document.uri,selection, vocabulary);
+			return vscode.workspace.applyEdit(edit);
+		});
+
         const provider = new LangTextEditorProvider(context);
 		const providerRegistration = vscode.window.registerCustomEditorProvider(LangTextEditorProvider.viewType, provider);
 		return providerRegistration;
@@ -76,6 +126,14 @@ export class LangTextEditorProvider implements vscode.CustomTextEditorProvider {
                     break;
                 }
 
+                case "getImeType": {
+                    const imeType = this.storageManager.getValue<string>(StorageKey.imetype);
+                    if (imeType != undefined) {
+                        this._view?.webview.postMessage({type: 'setImeType', data: imeType});
+                    }
+                    break;
+                }
+
                 case "changeLanguage": {
                     if (!msg.data) {
                       return;
@@ -94,7 +152,7 @@ export class LangTextEditorProvider implements vscode.CustomTextEditorProvider {
                     }
                     const imeType = await vscode.window.showQuickPick(msg.data);
                     if (imeType != undefined) {
-                        //this.storageManager.setValue<string>(StorageKey.imeType, imeType);
+                        this.storageManager.setValue<string>(StorageKey.imetype, imeType);
                         this._view?.webview.postMessage({type: 'setImeType', data: imeType});
                     }
                     break;

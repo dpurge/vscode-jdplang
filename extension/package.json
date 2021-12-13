@@ -13,7 +13,8 @@
     "onCustomEditor:jdplang.ankiPhrase",
     "onCommand:jdplang.ankiPhrase.new",
     "onCustomEditor:jdplang.langText",
-    "onCommand:jdplang.langText.new"
+    "onCommand:jdplang.langText.new",
+    "onCommand:jdplang.langText.convertSelectionToVocabulary"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -48,6 +49,11 @@
       {
         "command": "jdplang.langText.new",
         "title": "Create new LangText document",
+        "category": "JdpLang"
+      },
+      {
+        "command": "jdplang.langText.convertSelectionToVocabulary",
+        "title": "Convert selection to vocabulary list",
         "category": "JdpLang"
       }
     ],

@@ -10,7 +10,8 @@ export function getNonce() {
 }
 
 export enum StorageKey {
-	'langcode' = 'jdplang-langcode'
+	'langcode' = 'jdplang-langcode',
+	'imetype' = 'jdplang-imetype'
 }
 
 export class LocalStorageService {

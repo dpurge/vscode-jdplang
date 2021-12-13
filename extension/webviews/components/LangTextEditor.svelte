@@ -6,7 +6,6 @@
 
     let langcode: keyof typeof Language = 'spa';
 	let langname: string;
-    //let document: string[] = [];
     let style: string = 'latn';
     let imeType = 'none';
 
@@ -39,6 +38,7 @@
 
         vscode.postMessage({type: 'getDocument', data: null});
         vscode.postMessage({type: 'getLanguage', data: null});
+        vscode.postMessage({type: 'getImeType', data: null});
     });
 
     function changeLanguage() {

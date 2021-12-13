@@ -42,8 +42,8 @@
             style: 'latn',
             showTranscription: true,
             showGrammar: true,
-            phraseIME: '',
-            transcriptionIME: '',
+            phraseIME: 'ces-ime',
+            transcriptionIME: null,
             grammaticalCategory: ''
         },
         'cmn':{
@@ -159,8 +159,26 @@
             style: 'latn',
             showTranscription: false,
             showGrammar: true,
-            phraseIME: '',
-            transcriptionIME: '',
+            phraseIME: null,
+            transcriptionIME: null,
+            grammaticalCategory: ''
+        },
+        'lit':{
+            name: 'Lithuanian',
+            style: 'latn',
+            showTranscription: false,
+            showGrammar: true,
+            phraseIME: 'lit-phrase',
+            transcriptionIME: null,
+            grammaticalCategory: ''
+        },
+        'ron':{
+            name: 'Romanian',
+            style: 'latn',
+            showTranscription: false,
+            showGrammar: true,
+            phraseIME: 'ron-phrase',
+            transcriptionIME: null,
             grammaticalCategory: ''
         },
         'rus':{
@@ -204,8 +222,8 @@
             style: 'latn',
             showTranscription: true,
             showGrammar: true,
-            phraseIME: '',
-            transcriptionIME: '',
+            phraseIME: 'tur-phrase',
+            transcriptionIME: null,
             grammaticalCategory: ''
         },
         'uig':{
@@ -223,7 +241,7 @@
             showTranscription: true,
             showGrammar: true,
             phraseIME: '',
-            transcriptionIME: '',
+            transcriptionIME: null,
             grammaticalCategory: ''
         },
         'vie':{
