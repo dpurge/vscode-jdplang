@@ -31,7 +31,7 @@
         'bul':{
             name: 'Bulgarian',
             style: 'cyrl',
-            showTranscription: true,
+            showTranscription: false,
             showGrammar: true,
             phraseIME: 'bul-phrase',
             transcriptionIME: '',
@@ -40,7 +40,7 @@
         'ces':{
             name: 'Czech',
             style: 'latn',
-            showTranscription: true,
+            showTranscription: false,
             showGrammar: true,
             phraseIME: 'ces-ime',
             transcriptionIME: null,
@@ -67,7 +67,7 @@
         'deu':{
             name: 'German',
             style: 'latn',
-            showTranscription: true,
+            showTranscription: false,
             showGrammar: true,
             phraseIME: '',
             transcriptionIME: '',
@@ -76,7 +76,7 @@
         'ell':{
             name: 'Greek',
             style: 'grek',
-            showTranscription: true,
+            showTranscription: false,
             showGrammar: true,
             phraseIME: '',
             transcriptionIME: '',
@@ -94,7 +94,7 @@
         'fra':{
             name: 'French',
             style: 'latn',
-            showTranscription: true,
+            showTranscription: false,
             showGrammar: true,
             phraseIME: '',
             transcriptionIME: '',
@@ -121,7 +121,7 @@
         'hun':{
             name: 'Hungarian',
             style: 'latn',
-            showTranscription: true,
+            showTranscription: false,
             showGrammar: true,
             phraseIME: 'hun-phrase',
             transcriptionIME: null,
@@ -148,7 +148,7 @@
         'kaz':{
             name: 'Kazakh',
             style: 'cyrl',
-            showTranscription: true,
+            showTranscription: false,
             showGrammar: true,
             phraseIME: '',
             transcriptionIME: '',
@@ -184,7 +184,7 @@
         'rus':{
             name: 'Russian',
             style: 'cyrl',
-            showTranscription: true,
+            showTranscription: false,
             showGrammar: true,
             phraseIME: '',
             transcriptionIME: '',
@@ -193,7 +193,7 @@
         'spa':{
             name: 'Spanish',
             style: 'latn',
-            showTranscription: true,
+            showTranscription: false,
             showGrammar: true,
             phraseIME: '',
             transcriptionIME: '',
@@ -202,7 +202,7 @@
         'srp':{
             name: 'Serbian',
             style: 'cyrl',
-            showTranscription: true,
+            showTranscription: false,
             showGrammar: true,
             phraseIME: '',
             transcriptionIME: '',
@@ -211,7 +211,7 @@
         'tgk':{
             name: 'Tajik',
             style: 'cyrl',
-            showTranscription: true,
+            showTranscription: false,
             showGrammar: true,
             phraseIME: '',
             transcriptionIME: '',
@@ -220,7 +220,7 @@
         'tur':{
             name: 'Turkish',
             style: 'latn',
-            showTranscription: true,
+            showTranscription: false,
             showGrammar: true,
             phraseIME: 'tur-phrase',
             transcriptionIME: null,
@@ -238,7 +238,7 @@
         'uzb':{
             name: 'Uzbek',
             style: 'latn',
-            showTranscription: true,
+            showTranscription: false,
             showGrammar: true,
             phraseIME: '',
             transcriptionIME: null,
