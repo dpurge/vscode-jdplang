@@ -78,7 +78,7 @@
             style: 'grek',
             showTranscription: false,
             showGrammar: true,
-            phraseIME: '',
+            phraseIME: 'ell-phrase',
             transcriptionIME: '',
             grammaticalCategory: ''
         },
